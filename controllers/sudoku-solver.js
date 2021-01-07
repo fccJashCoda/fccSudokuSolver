@@ -9,6 +9,11 @@ class SudokuSolver {
       return { error: 'Invalid characters in puzzle' };
     }
 
+    const preGrid = puzzleString.replaceAll('.', '0');
+    const regex = /[0-9]{9}/g;
+    const rows = preGrid.match(regex);
+    this.grid = rows.map(row.split('').map((char) => Number(char)));
+
     return true;
   }
   checkRowPlacement(puzzleString, row, column, value) {
@@ -99,6 +104,12 @@ class SudokuSolver {
     if (!this.validate(puzzleString)) {
     }
   }
+
+  // slow but steady: backtracking algorythm;
+
+  // most efficient:
+  // https://www.cs.mcgill.ca/~aassaf9/python/sudoku.txt
+  // knut's algorythm x
 }
 
 module.exports = SudokuSolver;

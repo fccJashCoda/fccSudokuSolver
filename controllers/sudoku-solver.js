@@ -18,35 +18,39 @@ class SudokuSolver {
 
     return true;
   }
-  checkRowPlacement(puzzleString, row, column, value) {
-    const rowNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
-    const rowNum = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-    const x = column - 1;
-    const y = rowNum[rowNames.indexOf(row.toLowerCase())];
+  nextEmptySpot() {
+    for (let i = 0; i < this.grid.length; i++) {
+      for (let j = 0; j < this.grid.length; j++) {
+        if (this.grid[x][j] === 0) {
+          return [i, j];
+        }
+      }
+    }
+    return [-1, -1];
+  }
 
-    if (this.grid[y][x] !== 0) {
+  checkRowPlacement(puzzleString, row, col, value) {
+    // const rowNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
+    // const rowNum = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    // this conversion should be handled in the router
+
+    if (this.grid[row][col] !== 0) {
       return false;
     }
-    if (this.grid[x].indexOf(value) !== -1) {
+    if (this.grid[row].indexOf(value) !== -1) {
       return false;
     }
     return true;
   }
 
-  checkColPlacement(puzzleString, row, column, value) {
-    const rowNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
-    const rowNum = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-
-    const x = column - 1;
-    const y = rowNum[rowNames.indexOf(row.toLowerCase())];
-
-    if (this.grid[y][x] !== 0) {
+  checkColPlacement(puzzleString, row, col, value) {
+    if (this.grid[row][col] !== 0) {
       return false;
     }
 
     for (let i = 0; i < this.grid.length; i++) {
-      if (this.grid[i][x] === value) {
+      if (this.grid[i][col] === value) {
         return false;
       }
     }
@@ -54,19 +58,13 @@ class SudokuSolver {
     return true;
   }
 
-  checkRegionPlacement(puzzleString, row, column, value) {
-    const rowNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
-    const rowNum = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-
-    const x = column - 1;
-    const y = rowNum[rowNames.indexOf(row.toLowerCase())];
-
-    const x0 = Math.floor(x / 3) * 3;
-    const y0 = Math.floor(y / 3) * 3;
+  checkRegionPlacement(puzzleString, row, col, value) {
+    const rowRegion = Math.floor(row / 3) * 3;
+    const colRegion = Math.floor(col / 3) * 3;
 
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
-        if (this.grid[y0 + i][x0 + j] === value) {
+        if (this.grid[rowRegion + i][colRegion + j] === value) {
           return false;
         }
       }
@@ -75,60 +73,41 @@ class SudokuSolver {
   }
 
   solve(puzzleString) {
-    const valid = this.validate(puzzleString);
-    if (valid.error) {
-      return valid.error;
+    if (!this.grid) {
+      const valid = this.validate(puzzleString);
+      if (valid.error) {
+        return valid.error;
+      }
     }
+    console.log(this.grid);
 
-    function possible(x, y, n) {
-      for (let i = 0; i < 9; i++) {
-        if (this.grid[x][i] === n) {
-          return false;
-        }
+    const possible = (x, y, n) => {
+      if (
+        this.checkRowPlacement('', x, y, n) &&
+        this.checkColPlacement('', x, y, n) &&
+        this.checkRegionPlacement('', x, y, n)
+      ) {
+        return true;
       }
-      for (let i = 0; i < 9; i++) {
-        if (this.grid[i][y] === n) {
-          return false;
-        }
-      }
-
-      const x0 = Math.floor(x / 3) * 3;
-      const y0 = Math.floor(y / 3) * 3;
-
-      for (let i = 0; i < 3; i++) {
-        for (let j = 0; j < 3; j++) {
-          if (this.grid[y0 + i][x0 + j] === n) {
-            return false;
-          }
-        }
-      }
-
-      return true;
-    }
+      return false;
+    };
 
     for (let i = 0; i < this.grid.length; i++) {
       for (let j = 0; j < this.grid.length; j++) {
         if (this.grid[i][j] === 0) {
           for (let k = 1; k < 10; k++) {
-            if (possible(k)) {
+            if (possible(i, j, k)) {
               this.grid[i][j] = k;
               this.solve();
-              this.grid[i][j] = 0;
+              // this.grid[i][j] = 0;
             }
           }
           return;
         }
       }
     }
-
     // transform the grid back to a string and return it
   }
-
-  // slow but steady: backtracking algorythm;
-
-  // most efficient:
-  // https://www.cs.mcgill.ca/~aassaf9/python/sudoku.txt
-  // knut's algorythm x
 }
 
 module.exports = SudokuSolver;

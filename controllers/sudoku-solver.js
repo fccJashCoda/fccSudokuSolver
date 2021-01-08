@@ -35,10 +35,6 @@ class SudokuSolver {
   }
 
   checkRowPlacement(puzzleString, row, col, value) {
-    // const rowNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
-    // const rowNum = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    // this conversion should be handled in the router
-
     if (puzzleString) {
       this.validate(puzzleString);
     }
@@ -99,14 +95,7 @@ class SudokuSolver {
     return false;
   }
 
-  solve(puzzleString) {
-    if (!this.grid) {
-      const valid = this.validate(puzzleString);
-      if (valid.error) {
-        return valid.error;
-      }
-    }
-
+  solve() {
     const [row, col] = this.nextEmptySpot();
 
     if (row === -1) {
@@ -117,10 +106,7 @@ class SudokuSolver {
     for (let v = 1; v < 10; v++) {
       if (this.checkPossibility(row, col, v)) {
         this.grid[row][col] = v;
-        if (this.solve()) {
-          return true;
-        }
-
+        this.solve();
         this.grid[row][col] = 0;
       }
     }
@@ -128,9 +114,4 @@ class SudokuSolver {
   }
 }
 
-const s = new SudokuSolver();
-const p =
-  '..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
-s.solve(p);
-s.solution;
 module.exports = SudokuSolver;

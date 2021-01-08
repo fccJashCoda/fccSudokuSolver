@@ -22,7 +22,7 @@ class SudokuSolver {
   nextEmptySpot() {
     for (let i = 0; i < this.grid.length; i++) {
       for (let j = 0; j < this.grid.length; j++) {
-        if (this.grid[x][j] === 0) {
+        if (this.grid[i][j] === 0) {
           return [i, j];
         }
       }
@@ -81,32 +81,34 @@ class SudokuSolver {
     }
     console.log(this.grid);
 
-    const possible = (x, y, n) => {
+    const possible = (row, col, value) => {
       if (
-        this.checkRowPlacement('', x, y, n) &&
-        this.checkColPlacement('', x, y, n) &&
-        this.checkRegionPlacement('', x, y, n)
+        this.checkRowPlacement('', row, col, value) &&
+        this.checkColPlacement('', row, col, value) &&
+        this.checkRegionPlacement('', row, col, value)
       ) {
         return true;
       }
       return false;
     };
 
-    for (let i = 0; i < this.grid.length; i++) {
-      for (let j = 0; j < this.grid.length; j++) {
-        if (this.grid[i][j] === 0) {
-          for (let k = 1; k < 10; k++) {
-            if (possible(i, j, k)) {
-              this.grid[i][j] = k;
-              this.solve();
-              // this.grid[i][j] = 0;
-            }
-          }
-          return;
+    const [row, col] = this.nextEmptySpot();
+
+    if (row === -1) {
+      return true;
+    }
+
+    for (let v = 1; v < 10; v++) {
+      if (possible(row, col, v)) {
+        this.grid[row][col] = v;
+        if (this.solve()) {
+          return true;
         }
+
+        this.grid[row][col] = 0;
       }
     }
-    // transform the grid back to a string and return it
+    return false;
   }
 }
 

@@ -9,12 +9,7 @@ class SudokuSolver {
       return { error: 'Invalid characters in puzzle' };
     }
 
-    if (!this.grid) {
-      const preGrid = puzzleString.replaceAll('.', '0');
-      const regex = /[0-9]{9}/g;
-      const rows = preGrid.match(regex);
-      this.grid = rows.map((row) => row.split('').map((char) => Number(char)));
-    }
+    this.grid = this.buildGrid(puzzleString);
 
     return true;
   }
@@ -30,10 +25,23 @@ class SudokuSolver {
     return [-1, -1];
   }
 
+  buildGrid(puzzleString) {
+    let grid;
+    const preGrid = puzzleString.replaceAll('.', '0');
+    const regex = /[0-9]{9}/g;
+    const rows = preGrid.match(regex);
+    grid = rows.map((row) => row.split('').map((char) => Number(char)));
+    return grid;
+  }
+
   checkRowPlacement(puzzleString, row, col, value) {
     // const rowNames = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
     // const rowNum = [0, 1, 2, 3, 4, 5, 6, 7, 8];
     // this conversion should be handled in the router
+
+    if (puzzleString) {
+      this.validate(puzzleString);
+    }
 
     if (this.grid[row][col] !== 0) {
       return false;
@@ -45,6 +53,10 @@ class SudokuSolver {
   }
 
   checkColPlacement(puzzleString, row, col, value) {
+    if (puzzleString) {
+      this.validate(puzzleString);
+    }
+
     if (this.grid[row][col] !== 0) {
       return false;
     }
@@ -59,6 +71,10 @@ class SudokuSolver {
   }
 
   checkRegionPlacement(puzzleString, row, col, value) {
+    if (puzzleString) {
+      this.validate(puzzleString);
+    }
+
     const rowRegion = Math.floor(row / 3) * 3;
     const colRegion = Math.floor(col / 3) * 3;
 
@@ -72,6 +88,17 @@ class SudokuSolver {
     return true;
   }
 
+  checkPossibility(row, col, value) {
+    if (
+      this.checkRowPlacement('', row, col, value) &&
+      this.checkColPlacement('', row, col, value) &&
+      this.checkRegionPlacement('', row, col, value)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   solve(puzzleString) {
     if (!this.grid) {
       const valid = this.validate(puzzleString);
@@ -79,27 +106,16 @@ class SudokuSolver {
         return valid.error;
       }
     }
-    console.log(this.grid);
-
-    const possible = (row, col, value) => {
-      if (
-        this.checkRowPlacement('', row, col, value) &&
-        this.checkColPlacement('', row, col, value) &&
-        this.checkRegionPlacement('', row, col, value)
-      ) {
-        return true;
-      }
-      return false;
-    };
 
     const [row, col] = this.nextEmptySpot();
 
     if (row === -1) {
+      this.solution = this.grid.map((arr) => arr.join('')).join('');
       return true;
     }
 
     for (let v = 1; v < 10; v++) {
-      if (possible(row, col, v)) {
+      if (this.checkPossibility(row, col, v)) {
         this.grid[row][col] = v;
         if (this.solve()) {
           return true;
@@ -112,4 +128,9 @@ class SudokuSolver {
   }
 }
 
+const s = new SudokuSolver();
+const p =
+  '..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..';
+s.solve(p);
+s.solution;
 module.exports = SudokuSolver;

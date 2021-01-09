@@ -4,6 +4,10 @@ class SudokuSolver {
       return { error: 'Expected puzzle to be 81 characters long' };
     }
 
+    if (puzzleString.indexOf('.') === -1) {
+      return { error: 'Puzzle cannot be solved' };
+    }
+
     const regex = /^[.1-9]*$/;
     if (!regex.test(puzzleString)) {
       return { error: 'Invalid characters in puzzle' };
@@ -95,7 +99,14 @@ class SudokuSolver {
     return false;
   }
 
-  solve() {
+  solve(puzzleString) {
+    if (puzzleString) {
+      const valid = this.validate(puzzleString);
+      if (valid.error) {
+        return valid.error;
+      }
+    }
+
     const [row, col] = this.nextEmptySpot();
 
     if (row === -1) {
@@ -106,7 +117,9 @@ class SudokuSolver {
     for (let v = 1; v < 10; v++) {
       if (this.checkPossibility(row, col, v)) {
         this.grid[row][col] = v;
-        this.solve();
+        if (this.solve()) {
+          return true;
+        }
         this.grid[row][col] = 0;
       }
     }

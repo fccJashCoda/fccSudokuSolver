@@ -1,6 +1,6 @@
 class SudokuSolver {
   validate(puzzleString) {
-    if (!puzzleString.length === 81) {
+    if (puzzleString.length !== 81) {
       return { error: 'Expected puzzle to be 81 characters long' };
     }
 
@@ -31,7 +31,8 @@ class SudokuSolver {
 
   buildGrid(puzzleString) {
     let grid;
-    const preGrid = puzzleString.replaceAll('.', '0');
+    // const preGrid = puzzleString.replaceAll('.', '0');
+    const preGrid = puzzleString.replace(/\./g, '0');
     const regex = /[0-9]{9}/g;
     const rows = preGrid.match(regex);
     grid = rows.map((row) => row.split('').map((char) => Number(char)));
@@ -103,7 +104,7 @@ class SudokuSolver {
     if (puzzleString) {
       const valid = this.validate(puzzleString);
       if (valid.error) {
-        return valid.error;
+        return valid;
       }
     }
 

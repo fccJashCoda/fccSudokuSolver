@@ -31,7 +31,10 @@ module.exports = function (app) {
     const col = Number(x) - 1;
     const row = yTranslation[yDictionary.indexOf(y)];
 
-    solver.validate(req.body.puzzle);
+    const validate = solver.validate(req.body.puzzle);
+    if (validate.error) {
+      return res.json({ error: validate.error });
+    }
 
     if (!solver.checkRowPlacement('', row, col, value)) {
       conflict.push('row');

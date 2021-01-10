@@ -10,8 +10,9 @@ module.exports = function (app) {
       return res.json({ error: 'Required field(s) missing' });
     }
 
+    const coordinate = req.body.coordinate.toLowerCase();
     const coordRgx = /^[a-i][1-9]$/;
-    if (!coordRgx.test(req.body.coordinate)) {
+    if (!coordRgx.test(coordinate)) {
       return res.json({ error: 'Invalid coordinate' });
     }
 
@@ -21,7 +22,7 @@ module.exports = function (app) {
     }
 
     const conflict = [];
-    const [y, x] = req.body.coordinate.split('');
+    const [y, x] = coordinate.split('');
     const value = Number(req.body.value);
 
     const yDictionary = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];

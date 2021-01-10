@@ -1,4 +1,3 @@
-const { AssertionError } = require('chai');
 const chai = require('chai');
 const assert = chai.assert;
 

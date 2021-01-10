@@ -59,7 +59,10 @@ module.exports = function (app) {
       return res.json({ error: validate.error });
     }
 
-    solver.solve();
+    if (!solver.solve()) {
+      return res.json({ error: 'Puzzle cannot be solved' });
+    }
+
     res.json({ solution: solver.solution });
   });
 };
